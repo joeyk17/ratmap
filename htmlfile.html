@@ -65,15 +65,15 @@
     var ratIcon = L.icon({
     iconUrl: 'rat.png',
     iconSize: [50,40]
-  }); 
+     }); 
 	var clusters = L.markerClusterGroup();
-	var rodents = L.geoJson(data  ,{
-    pointToLayer: function(feature,latlng){
-		var marker = L.marker(latlng,{icon: ratIcon});
-	marker.bindPopup(feature.properties.Location + '<br/>' + feature.properties.OPEN_DT);
-	return marker; 
+	var rodents = L.geoJson(data,{
+    	 pointToLayer: function(feature,latlng){
+	 var marker = L.marker(latlng,{icon: ratIcon});
+	 marker.bindPopup(feature.properties.Location + '' + feature.properties.OPEN_DT);
+	 return marker; 
     }
-  }  ).addTo(map);
+  }  );
 	 
 	 clusters.addLayer(rodents);
 	map.addLayer(clusters);
