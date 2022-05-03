@@ -1,0 +1,83 @@
+<!DOCTYPE html>		
+<html>
+<head>
+	<title>A Leaflet map!</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+	<link rel="stylesheet" href="./Leaflet.markercluster-1.0.5/MarkerCluster.Default.css"/> 
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+	 <script src="./Leaflet.markercluster-1.0.5/leaflet.markercluster.js"></script>
+	 <script src="jquery-2.1.1.min.js"></script> 
+	<style>
+	html, body {
+      height: 100%;
+      margin: 0;
+    }
+	#map{ height: 100% }
+	</style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <script>
+
+  // initialize the map
+  var map = L.map('map').setView([42.35, -71.08], 13);
+
+  var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: 'pk.eyJ1Ijoiam9leWstMTciLCJhIjoiY2wyZmk1dDdyMDRmeTNncHZqZjZhbnc1ZyJ9.PtqSqcYKdBXtZQ4R9Kei9A'
+}).addTo(map);
+
+	L.tileLayer('http://tiles.mapc.org/trailmap-onroad/{z}/{x}/{y}.png',
+	{
+	maxZoom: 17,
+	minZoom: 9
+	}).addTo(map); 
+	
+
+  $.getJSON("neighborhoods.geojson",function(hoodData){
+  L.geoJson( hoodData  , {
+    style: function(feature){
+      var fillColor,
+          density = feature.properties.density;
+      if ( density > 80 ) fillColor = "#006837";
+      else if ( density > 40 ) fillColor = "#31a354";
+      else if ( density > 20 ) fillColor = "#78c679";
+      else if ( density > 10 ) fillColor = "#c2e699";
+      else if ( density > 0 ) fillColor = "#ffffcc";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .6 };
+    },
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup( "<strong>" + feature.properties.Name + "</strong><br/>" + feature.properties.density + " rats per square mile" )
+    }
+  }  ).addTo(map);
+});
+
+ $.getJSON("rodents.geojson",function(data){
+    var ratIcon = L.icon({
+    iconUrl: 'rat.gif',
+    iconSize: [50,40]
+  }); 
+	var clusters = L.markerClusterGroup();
+	var rodents = L.geoJson(data  ,{
+    pointToLayer: function(feature,latlng){
+		var marker = L.marker(latlng,{icon: ratIcon});
+	marker.bindPopup(feature.properties.Location + '<br/>' + feature.properties.OPEN_DT);
+	return marker; 
+    }
+  }  ).addTo(map);
+});
+	clusters.addLayer(rodents);
+	map.addLayer(clusters);
+   
+  </script>
+ </body>
+</html>
