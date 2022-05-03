@@ -42,7 +42,7 @@
 	}).addTo(map); 
 	
 
-  $.getJSON("neighborhoods.geojson",function(hoodData){
+  $.getJSON(neighborhoods.geojson,function(hoodData){
   L.geoJson( hoodData  , {
     style: function(feature){
       var fillColor,
@@ -61,7 +61,7 @@
   }  ).addTo(map);
 });
 
- $.getJSON("rodents.geojson",function(data){
+ $.getJSON(rodents.geojson,function(data){
     var ratIcon = L.icon({
     iconUrl: 'rat.gif',
     iconSize: [50,40]
